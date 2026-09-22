@@ -1,0 +1,44 @@
+{
+  "info": {
+    "name": "Inventory & Order API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3000" },
+    { "key": "token", "value": "" },
+    { "key": "productId", "value": "507f1f77bcf86cd799439011" },
+    { "key": "orderId", "value": "507f1f77bcf86cd799439012" },
+    { "key": "otherUserOrderId", "value": "507f1f77bcf86cd799439013" }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        { "name": "Register", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"name\": \"Prince\",\n  \"email\": \"prince@example.com\",\n  \"password\": \"password123\"\n}" }, "url": "{{baseUrl}}/auth/register" } },
+        { "name": "Login", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"email\": \"prince@example.com\",\n  \"password\": \"password123\"\n}" }, "url": "{{baseUrl}}/auth/login" } }
+      ]
+    },
+    {
+      "name": "Products",
+      "item": [
+        { "name": "Create product", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"name\": \"Keyboard\",\n  \"description\": \"Mechanical keyboard\",\n  \"price\": 79.99,\n  \"stockQuantity\": 10,\n  \"category\": \"electronics\"\n}" }, "url": "{{baseUrl}}/products" } },
+        { "name": "List products with filters", "request": { "method": "GET", "url": "{{baseUrl}}/products?search=key&category=electronics&inStock=true&page=1&limit=20" } },
+        { "name": "Get product", "request": { "method": "GET", "url": "{{baseUrl}}/products/{{productId}}" } },
+        { "name": "Update product", "request": { "method": "PATCH", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"price\": 69.99,\n  \"stockQuantity\": 12\n}" }, "url": "{{baseUrl}}/products/{{productId}}" } },
+        { "name": "Delete product", "request": { "method": "DELETE", "url": "{{baseUrl}}/products/{{productId}}" } },
+        { "name": "Edge: product not found", "request": { "method": "GET", "url": "{{baseUrl}}/products/507f1f77bcf86cd799439099" } }
+      ]
+    },
+    {
+      "name": "Orders (protected)",
+      "item": [
+        { "name": "Create order", "request": { "method": "POST", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"items\": [{ \"productId\": {{productId}}, \"quantity\": 1 }]\n}" }, "url": "{{baseUrl}}/orders" } },
+        { "name": "List my orders", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": "{{baseUrl}}/orders" } },
+        { "name": "Get my order", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": "{{baseUrl}}/orders/{{orderId}}" } },
+        { "name": "Edge: insufficient stock or missing product", "request": { "method": "POST", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"items\": [{ \"productId\": \"507f1f77bcf86cd799439099\", \"quantity\": 1 }]\n}" }, "url": "{{baseUrl}}/orders" } },
+        { "name": "Edge: another user's order (403)", "request": { "method": "GET", "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }], "url": "{{baseUrl}}/orders/{{otherUserOrderId}}" } },
+        { "name": "Edge: missing auth (401)", "request": { "method": "GET", "url": "{{baseUrl}}/orders" } }
+      ]
+    }
+  ]
+}
